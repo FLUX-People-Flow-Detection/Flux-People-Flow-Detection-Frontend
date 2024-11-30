@@ -26,7 +26,6 @@ export default {
         })
 
 
-//我是ikun.
        
 
         function sign() {
