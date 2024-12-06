@@ -24,7 +24,6 @@
 
 
 
-
     <el-dialog v-model="data.modifyflag" title="修改">
         <span>ID:{{ data.modifydata.id }}</span><br>
         <span>摄像头名称：</span>
