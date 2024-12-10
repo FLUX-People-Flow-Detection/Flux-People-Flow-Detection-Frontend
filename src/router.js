@@ -1,45 +1,41 @@
-import { createRouter, createWebHashHistory, createWebHistory } from "vue-router"
-
-
-
+import {
+  createRouter,
+  createWebHashHistory,
+  createWebHistory,
+} from "vue-router";
 
 // 2. 定义路由配置
 const routes = [
   {
-    path: '/',
-    component: () => import('./pages/Home.vue'),
+    path: "/",
+    component: () => import("./pages/Home.vue"),
     children: [
       {
-        path: '',
-        component: () => import('./pages/Visualization.vue'),
+        path: "",
+        component: () => import("./pages/Visualization.vue"),
       },
       {
-        path: 'video',
-        component: () => import('./pages/Video.vue'),
+        path: "video",
+        component: () => import("./pages/Video.vue"),
       },
       {
-        path: 'camera',
-        component: () => import('./pages/Camera.vue'),
+        path: "camera",
+        component: () => import("./pages/Camera.vue"),
       },
       {
-        path: 'detail',
-        component: () => import('./pages/Detail.vue'),
+        path: "detail",
+        component: () => import("./pages/Detail.vue"),
       },
       {
-        path: 'User',
-        component: () => import('./pages/User.vue'),
+        path: "User",
+        component: () => import("./pages/User.vue"),
       },
-
-
-    ]
+    ],
   },
   {
-
-    path: '/login',
-    component: () => import('./pages/Login.vue'),
+    path: "/login",
+    component: () => import("./pages/Login.vue"),
   },
-
-
 ];
 
 // 3. 创建路由实例
@@ -51,19 +47,15 @@ const router = createRouter({
   routes, //使用上方定义的路由配置
 });
 
-
-
 router.beforeEach((to, from, next) => {
-  if (to.path == '/login') {
+  if (to.path == "/login") {
     next();
-  } else if (localStorage.getItem('name') == null) {
+  } else if (localStorage.getItem("name") == null) {
     router.push("login");
   } else {
-    next()
+    next();
   }
-
 });
 
-
-export default router
+export default router;
 //导出router
