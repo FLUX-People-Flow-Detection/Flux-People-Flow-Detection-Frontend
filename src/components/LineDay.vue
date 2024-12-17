@@ -1,6 +1,6 @@
 <template>
     <div class="block">
-        <el-date-picker v-model="data.day1" value-format="YYYY-MM-DD" type="date" placeholder="今日"
+        <el-date-picker v-model="data.day1" value-format="YYYY-MM-DD" type="date" placeholder="2024-12-11"
             @change="daydatechange" />
     </div>
     <div class="linechart1">
@@ -53,7 +53,7 @@ export default {
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: ['0:00', '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
+                    data: ['0:10', '0:20', '0:30', '0:40', '0:50', '1:00', '1:10', '1:20', '1:30', '1:40', '1:50', '2:00', '2:10', '2:20', '2:30']
                 },
                 yAxis: {
                     type: 'value'
@@ -61,8 +61,6 @@ export default {
                 series: [
 
                 ]
-
-
 
             }
         })
@@ -107,12 +105,7 @@ export default {
         }
 
         function getFormattedDate() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const day = now.getDate();
-            const date = `${year}-${month}-${day}`;
-            return date;
+          return "2024-12-11";
         }
 
         //onMounted：在初始化页面完成后执行
@@ -120,7 +113,7 @@ export default {
             data.cameras = store.state.camera
 
 
-            //默认展示当天的数据
+            //默认展示2024年12月11日的数据
             axios.get('api/detection/perday/' + getFormattedDate()).then(res => {
                 data.perday = res.data
                 perdayToOption()
