@@ -2,7 +2,7 @@
   <div class="common-layout">
     <el-container class="container">
       <el-aside class="aside"><el-menu :default-active="data.active" router class="el-menu-vertical-demo">
-          <div class="asideTop">XXX商场</div>
+          <div class="asideTop">福州大学</div>
           <el-menu-item index="/">
             <el-icon>
               <PieChart />
@@ -58,7 +58,7 @@
     </el-container>
   </div>
 </template>
-
+    
 <script>
 import { reactive, computed, watchEffect, onMounted } from 'vue'
 import axios from 'axios'          //引入axios
