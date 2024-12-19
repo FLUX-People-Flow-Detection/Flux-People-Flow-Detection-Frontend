@@ -3,25 +3,12 @@
         <el-tab-pane label="日">
             <LineDay />
         </el-tab-pane>
-        <el-tab-pane label="周">
-            <LineWeek />
-        </el-tab-pane>
-        <el-tab-pane label="月">
-            <LineMonth />
-        </el-tab-pane>
-        <el-tab-pane label="年">
-            <LineYear />
-
-        </el-tab-pane>
     </el-tabs>
 </template>
   
 <script>
 import { reactive, computed, watchEffect, onMounted } from 'vue'
 import LineDay from './LineDay.vue'  //引入组件
-import LineWeek from './LineWeek.vue'  //引入组件
-import LineMonth from './LineMonth.vue'  //引入组件
-import LineYear from './LineYear.vue'  //引入组件
 import axios from 'axios'          //引入axios
 export default {
     //组件名
@@ -29,9 +16,6 @@ export default {
 
     components: {
         LineDay,    //注册组件
-        LineWeek,
-        LineMonth,
-        LineYear
     },
 
 
