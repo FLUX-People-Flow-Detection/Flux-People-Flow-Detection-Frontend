@@ -1,10 +1,7 @@
 <template>
-    <div class="block">
-        <el-date-picker v-model="data.day1" value-format="YYYY-MM-DD" type="date" placeholder="2024-12-11"
-            @change="daydatechange" />
-    </div>
-    <div class="linechart1">
-        <v-chart class="charts" :option="data.option" autoresize></v-chart>
+    <div class="con">
+        <div id="container"></div>
+        <div v-show="data.show" id="note" class="note">{{ data.camera }}</div>
     </div>
 </template>
   
@@ -12,118 +9,118 @@
 import { reactive, computed, watchEffect, onMounted } from 'vue'
 import axios from 'axios'          //引入axios
 import { useStore } from 'vuex'
-import { useRouter } from "vue-router";
 export default {
     //组件名
-    name: 'LineDay',
-
+    name: 'Map',
     setup() {
         const store = useStore()
-        const router = useRouter()
         let data = reactive({
-            day1: "",
-            perday: {},
             cameras: {},
+            camera: "",
+            show: false
+
 
         })
 
+        function map() {
+            //创建地图组件
+            var map = new AMap.Map(document.getElementById("container"), {
+              zoom: 18,
+              center: [119.195484, 26.058897]  // 添加中心点坐标
+            });
 
-        //表配置
-        data.option = computed(() => {     //属性直接追加到data中
-            return {
-                title: {
-                    text: '单日人流量'
-                },
-                tooltip: {
-                    trigger: 'axis',
-                },
-                legend: {
-                    show: true, //是否显示
-                    data: Object.keys(data.perday),            //将所有键转化为数组
-                    //data:[]
-
-                },
-                grid: {
-                    left: '3%',
-                    right: '4%',
-                    bottom: '3%',
-                    containLabel: true
-                },
-
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false,
-                    data: ['0:10', '0:20', '0:30', '0:40', '0:50', '1:00', '1:10', '1:20', '1:30', '1:40', '1:50', '2:00', '2:10', '2:20', '2:30']
-                },
-                yAxis: {
-                    type: 'value'
-                },
-                series: [
-
-                ]
-
-            }
-        })
-
-
-        //将获取到的人流量信息更新到图表option中
-        function perdayToOption() {
-            var keys = Object.keys(data.perday);
-            for (var i = 0; i < keys.length; i++) {
-                if (keys[i] == 0) {
-                    data.option.legend.data[i] = "总计";
-                    data.option.series[i] = {
-                        name: "总计",
-                        type: 'line',
-                        smooth: true,
-                        data: data.perday[keys[i]]
-                    }
-                } else {
-                    var camera = data.cameras.filter(function (camera) {   //找出摄像头id所对应的名字,此处返回的是数组
-                        return camera.id == keys[i]
-                    })
-                    data.option.legend.data[i] = camera[0].name;
-                    data.option.series[i] = {
-                        name: camera[0].name,
-                        type: 'line',
-                        smooth: true,
-                        data: data.perday[keys[i]]
-                    }
-                }
-            }
-        }
-
-        //日历组件更新值时触发
-        //日
-        function daydatechange() {
-            axios.get('api/detection/perday/' + data.day1).then(res => {
-                data.perday = res.data
-                perdayToOption()
-            }, err => {
-                console.log(err);
+            //设置为室内地图   https://lbs.amap.com/api/javascript-api/guide/layers/official-layers
+            map.on('indoor_create', function () {
+                map.indoorMap.showIndoorMap('B0FFIL7S89', 1);
             })
+
+            //添加上交通图
+            var traffic = new AMap.TileLayer.Traffic({
+                'autoRefresh': true,     //是否自动刷新，默认为false
+                'interval': 180,         //刷新间隔，默认180s
+            });
+            map.add(traffic); //通过add方法添加图层
+
+
+            // 创建一个 Icon
+            var startIcon = new AMap.Icon({
+                // 图标尺寸
+                size: new AMap.Size(40, 40),
+                // 图标的取图地址
+                image: '../src/assets/camera.svg',
+                // 图标所用图片大小
+                imageSize: new AMap.Size(40, 40),
+                // 图标取图偏移量
+                //imageOffset: new AMap.Pixel(-9, -3)
+            });
+
+
+            //[116.35532, 39.86050],
+
+
+            var keys = Object.keys(data.cameras);
+
+            for (var i = 0; i < keys.length; i++) {
+                //摄像头数据
+                var x = data.cameras[keys[i]].positionx
+                var y = data.cameras[keys[i]].positiony
+
+                // 将 icon 传入 marker
+                var Marker = new AMap.Marker({
+                    //位置
+                    position: new AMap.LngLat(x, y),//以图标左上角为准
+                    //使用的图标
+                    icon: startIcon,
+                    // 设置了 icon 以后，设置 icon 的偏移量，以 icon 的 [center bottom] 为原点
+                    offset: new AMap.Pixel(-12, -20)
+                });
+
+                //添加属性，以便区分
+                Marker.setExtData(keys[i])
+
+                //为图标添加点击事件
+                Marker.on('click', clicknote);
+                //为图标添加点击事件
+                Marker.on('mouseover', shownote);
+                Marker.on('mouseout', closenote);
+
+
+                map.add(Marker)
+
+            }
+
         }
 
-        function getFormattedDate() {
-          return "2024-12-11";
+        //鼠标移入，显示标注
+        function shownote(e) {
+            data.show = true
+            let text = document.getElementById("note");
+            text.style.left = parseInt(e.pixel.getX()) - 85 + "px";
+            text.style.top = parseInt(e.pixel.getY()) - 35 + "px";
+            data.camera = data.cameras[e.target.getExtData()].name
+
         }
 
+        function closenote(e) {
+            data.show = false
+
+
+        }
+
+
+        function clicknote(e) {
+
+
+
+        }
+
+
+
+        //生命周期函数，
         //onMounted：在初始化页面完成后执行
         onMounted(() => {
             data.cameras = store.state.camera
-
-
-            //默认展示2024年12月11日的数据
-            axios.get('api/detection/perday/' + getFormattedDate()).then(res => {
-                data.perday = res.data
-                perdayToOption()
-            }, err => {
-                console.log(err);
-                if (err.response.status == 401) {          //未登录，重定向到登录页面
-                    router.push("login");
-                }
-            })
-
+            map()     //创建地图
 
         })
 
@@ -131,7 +128,6 @@ export default {
         //数据和函数都要返回
         return {
             data,
-            daydatechange,
         }
     },
 
@@ -140,18 +136,33 @@ export default {
 
 }
 </script>
-
 <style scoped>
-.linechart1 {
-    height: 100%;
-    width: 100%;
+.note {
+    position: absolute;
+    background-color: #ffffff;
+    width: 80px;
+    height: 30px;
+    cursor: default;
+    text-align: center;
+    line-height: 1.8;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px #6d6d6d;
+    /** 
+    font-family: SimHei;  
+    font-size: large;
+    font-weight: bold;
+    */
 }
 
-.block {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    z-index: 9999;
+.con {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#container {
+    width: 100%;
+    height: 100%;
 }
 </style>
   
