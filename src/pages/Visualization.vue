@@ -1,4 +1,4 @@
-y<template>
+<template>
     <div class="container">
         <div class="num">
             <NumShow /> 
