@@ -23,7 +23,7 @@ export default {
         data.option = computed(() => {     //属性直接追加到data中
             return {
                 title: {
-                    text: '当日各位置人数分布',
+                    text: '各位置人数分布',
                     subtext: '以进入人次统计',
                     left: 'center'
                 },
@@ -83,12 +83,7 @@ export default {
         }
 
         function getFormattedDate() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth() + 1;
-            const day = now.getDate();
-            const date = `${year}-${month}-${day}`;
-            return date;
+          return "2024-12-11";
         }
 
 
@@ -119,10 +114,6 @@ export default {
             chart
         }
     },
-
-
-
-
 }
 </script>
   
